@@ -17,22 +17,22 @@
     {
       "name": "flixel",
       "type": "haxelib",
-      "version": "4.11.0"
+      "version": "5.2.2"
     },
     {
       "name": "flixel-addons",
       "type": "haxelib",
-      "version": "2.11.0"
+      "version": "3.0.2"
     },
     {
       "name": "flixel-ui",
       "type": "haxelib",
-      "version": "2.4.0"
+      "version": "2.5.0"
     },
     {
       "name": "hscript",
       "type": "haxelib",
-      "version": "2.4.0"
+      "version": "2.5.0"
     },
     {
       "name": "hxCodec",
@@ -58,7 +58,7 @@
     {
       "name": "openfl",
       "type": "haxelib",
-      "version": "9.1.0"
+      "version": "9.2.2"
     },
     {
       "name": "flixel-tools",
@@ -67,8 +67,10 @@
     },
     {
       "name": "flxanimate",
-      "type": "haxelib",
-      "version": "3.0.4"
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/ShadowMario/flxanimate.git"
     }
   ]
 }
