@@ -44,8 +44,8 @@ jobs:
       - name: Publish The Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Release 0.6.3"
-          tag_name: "0.6.3"
+          name: "Release 0.6.3 Second Update"
+          tag_name: "0.6.3 Update"
           prerelease: false
           files: |
             /home/runner/*.apk
