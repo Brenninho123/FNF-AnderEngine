@@ -11,15 +11,8 @@
       "name": "linc_luajit",
       "type": "git",
       "dir": null,
-      "ref": "master",
-      "url": "https://github.com/AlafandyPorting/linc_luajit"
-    },
-    {
-      "name": "extension-androidtools",
-      "type": "git",
-      "dir": null,
       "ref": "main",
-      "url": "https://github.com/MAJigsaw77/extension-androidtools"
+      "url": "https://github.com/idkwhoiam381/linc_luajit-by-me"
     },
     {
       "name": "flixel",
@@ -49,24 +42,23 @@
       "url": "https://github.com/AlafandyPorting/hxCodec"
     },
     {
+      "name": "hxcpp",
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/idkwhoiam381/hxcpp-by-me"
+    },
+    {
       "name": "lime",
-      "type": "haxelib",
-      "version": "8.0.1"
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/idkwhoiam381/lime2"
     },
     {
       "name": "openfl",
       "type": "haxelib",
-      "version": "9.2.1"
-    },
-    {
-      "name": "flixel-demos",
-      "type": "haxelib",
-      "version": "2.9.0"
-    },
-    {
-      "name": "flixel-templates",
-      "type": "haxelib",
-      "version": "2.6.6"
+      "version": "9.2.2"
     },
     {
       "name": "flixel-tools",
@@ -74,14 +66,11 @@
       "version": "1.5.1"
     },
     {
-      "name": "lime-samples",
-      "type": "haxelib",
-      "version": "7.0.0"
-    },
-    {
       "name": "flxanimate",
-      "type": "haxelib",
-      "version": "3.0.4"
+      "type": "git",
+      "dir": null,
+      "ref": "dev",
+      "url": "https://github.com/ShadowMario/flxanimate.git"
     }
   ]
 }
