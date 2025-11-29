@@ -1,9 +1,11 @@
 package;
 
 import flixel.graphics.FlxGraphic;
+
 #if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
+
 import Section.SwagSection;
 import Song.SwagSong;
 import WiggleEffect.WiggleEffectType;
@@ -1098,10 +1100,12 @@ class PlayState extends MusicBeatState
 
 		// startCountdown();
 
+		#if mobile
 		#if !android
 		addTouchPad("NONE", "P");
 		addTouchPadCamera();
 		touchPad.visible = true;
+		#end
 		#end
 		
 		#if mobile
@@ -3079,9 +3083,8 @@ class PlayState extends MusicBeatState
 			FlxG.android.justReleased.BACK
 			#else
 			touchPad.buttonP.justPressed
-			#end ||
-			controls.PAUSE && startedCountdown && canPause
-		)
+			#end
+			|| controls.PAUSE && startedCountdown && canPause)
 		{
 			var ret:Dynamic = callOnLuas('onPause', [], false);
 			if(ret != FunkinLua.Function_Stop) {
@@ -3942,7 +3945,6 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-
 	public var transitioning = false;
 	public function endSong():Void
 	{
@@ -3964,7 +3966,13 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		mobileControls.instance.visible = #if !android touchPad.visible = #end false;
+		#if mobile
+		mobileControls.instance.visible = #if !android
+										  touchPad.visible =
+										  #end
+										  false;
+		#end
+		
 		timeBarBG.visible = false;
 		timeBar.visible = false;
 		timeTxt.visible = false;
