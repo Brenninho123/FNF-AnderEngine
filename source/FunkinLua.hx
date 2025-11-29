@@ -2797,6 +2797,7 @@ class FunkinLua {
 			return list;
 		});
 
+		#if mobile
 		Lua_helper.add_callback(lua, 'mobileC', Controls.instance.mobileC);
 
 		Lua_helper.add_callback(lua, 'mobileControlsMode', () -> {
@@ -3149,6 +3150,7 @@ class FunkinLua {
 			if (text != null) return luaTrace('setActivityTitle: No text specified.');
 			PsychJNI.setActivityTitle(text);
 		});
+		#end
 		#end
 
 		call('onCreate', []);
