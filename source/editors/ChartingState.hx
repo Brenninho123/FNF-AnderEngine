@@ -1840,7 +1840,7 @@ class ChartingState extends MusicBeatState
 			{
 				FlxG.sound.music.pause();
 				if (!mouseQuant)
-					FlxG.sound.music.time -= (FlxG.mouse.wheel * Conductor.stepCrochet*0.8);
+					FlxG.sound.music.time -= (FlxG.mouse.wheel * Conductor.stepCrochet * 0.8);
 				else
 					{
 						var time:Float = FlxG.sound.music.time;
@@ -1888,7 +1888,7 @@ class ChartingState extends MusicBeatState
 			}
 
 			if(!vortex) {
-				if (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN  )
+				if (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN)
 				{
 					FlxG.sound.music.pause();
 					updateCurStep();
@@ -1909,7 +1909,7 @@ class ChartingState extends MusicBeatState
 
 			var style = currentType;
 
-			if (touchPad.buttonY.pressed || FlxG.keys.pressed.SHIFT){
+			if (touchPad.buttonY.pressed || FlxG.keys.pressed.SHIFT) {
 				style = 3;
 			}
 
@@ -1953,7 +1953,6 @@ class ChartingState extends MusicBeatState
 				if (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN)
 				{
 					FlxG.sound.music.pause();
-
 
 					updateCurStep();
 					//FlxG.sound.music.time = (Math.round(curStep / quants[curQuant]) * quants[curQuant]) * Conductor.stepCrochet;
@@ -2018,6 +2017,279 @@ class ChartingState extends MusicBeatState
 				}
 			}
 			#else
+			if (FlxG.keys.justPressed.ESCAPE)
+			{
+				autosaveSong();
+				LoadingState.loadAndSwitchState(new editors.EditorPlayState(sectionStartTime()));
+			}
+			if (FlxG.keys.justPressed.ENTER)
+			{
+				autosaveSong();
+				FlxG.mouse.visible = false;
+				PlayState.SONG = _song;
+				FlxG.sound.music.stop();
+				if(vocals != null) vocals.stop();
+
+				//if(_song.stage == null) _song.stage = stageDropDown.selectedLabel;
+				StageData.loadDirectory(_song);
+				LoadingState.loadAndSwitchState(new PlayState());
+			}
+
+			if(curSelectedNote != null && curSelectedNote[1] > -1) {
+				if (FlxG.keys.justPressed.E)
+				{
+					changeNoteSustain(Conductor.stepCrochet);
+				}
+				if (FlxG.keys.justPressed.Q)
+				{
+					changeNoteSustain(-Conductor.stepCrochet);
+				}
+			}
+
+			if (FlxG.keys.justPressed.BACKSPACE) {
+				PlayState.chartingMode = false;
+				MusicBeatState.switchState(new editors.MasterEditorMenu());
+				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+				FlxG.mouse.visible = false;
+				return;
+			}
+
+			if(FlxG.keys.justPressed.Z && FlxG.keys.pressed.CONTROL) {
+				undo();
+			}
+
+			if(FlxG.keys.justPressed.Z && curZoom > 0 && !FlxG.keys.pressed.CONTROL) {
+				--curZoom;
+				updateZoom();
+			}
+			if(FlxG.keys.justPressed.X && curZoom < zoomList.length - 1) {
+				curZoom++;
+				updateZoom();
+			}
+
+			if (FlxG.keys.justPressed.TAB)
+			{
+				if (FlxG.keys.pressed.SHIFT)
+				{
+					UI_box.selected_tab -= 1;
+					if (UI_box.selected_tab < 0)
+						UI_box.selected_tab = 2;
+				}
+				else
+				{
+					UI_box.selected_tab += 1;
+					if (UI_box.selected_tab >= 3)
+						UI_box.selected_tab = 0;
+				}
+			}
+
+			if (touchPad.buttonX.justPressed || FlxG.keys.justPressed.SPACE)
+			{
+				if (FlxG.sound.music.playing)
+				{
+					FlxG.sound.music.pause();
+					if(vocals != null) vocals.pause();
+				}
+				else
+				{
+					if(vocals != null) {
+						vocals.play();
+						vocals.pause();
+						vocals.time = FlxG.sound.music.time;
+						vocals.play();
+					}
+					FlxG.sound.music.play();
+				}
+			}
+
+			if (!FlxG.keys.pressed.ALT && FlxG.keys.justPressed.R)
+			{
+				if (FlxG.keys.pressed.SHIFT)
+					resetSection(true);
+				else
+					resetSection();
+			}
+
+			if (FlxG.mouse.wheel != 0)
+			{
+				FlxG.sound.music.pause();
+				if (!mouseQuant)
+					FlxG.sound.music.time -= (FlxG.mouse.wheel * Conductor.stepCrochet * 0.8);
+				else
+					{
+						var time:Float = FlxG.sound.music.time;
+						var beat:Float = curDecBeat;
+						var snap:Float = quantization / 4;
+						var increase:Float = 1 / snap;
+						if (FlxG.mouse.wheel > 0)
+						{
+							var fuck:Float = CoolUtil.quantize(beat, snap) - increase;
+							FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+						} else {
+							var fuck:Float = CoolUtil.quantize(beat, snap) + increase;
+							FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+						}
+					}
+				if(vocals != null) {
+					vocals.pause();
+					vocals.time = FlxG.sound.music.time;
+				}
+			}
+
+			//ARROW VORTEX SHIT NO DEADASS
+
+			if (FlxG.keys.pressed.W || FlxG.keys.pressed.S)
+			{
+				FlxG.sound.music.pause();
+
+				var holdingShift:Float = 1;
+				if (FlxG.keys.pressed.CONTROL) holdingShift = 0.25;
+				else if (touchPad.buttonY.pressed || FlxG.keys.pressed.SHIFT) holdingShift = 4;
+
+				var daTime:Float = 700 * FlxG.elapsed * holdingShift;
+
+				if (touchPad.buttonUp.pressed || FlxG.keys.pressed.W)
+				{
+					FlxG.sound.music.time -= daTime;
+				}
+				else
+					FlxG.sound.music.time += daTime;
+
+				if(vocals != null) {
+					vocals.pause();
+					vocals.time = FlxG.sound.music.time;
+				}
+			}
+
+			if(!vortex) {
+				if (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN)
+				{
+					FlxG.sound.music.pause();
+					updateCurStep();
+					var time:Float = FlxG.sound.music.time;
+					var beat:Float = curDecBeat;
+					var snap:Float = quantization / 4;
+					var increase:Float = 1 / snap;
+					if (FlxG.keys.pressed.UP)
+					{
+						var fuck:Float = CoolUtil.quantize(beat, snap) - increase; //(Math.floor((beat+snap) / snap) * snap);
+						FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+					} else {
+						var fuck:Float = CoolUtil.quantize(beat, snap) + increase; //(Math.floor((beat+snap) / snap) * snap);
+						FlxG.sound.music.time = Conductor.beatToSeconds(fuck);
+					}
+				}
+			}
+
+			var style = currentType;
+
+			if (FlxG.keys.pressed.SHIFT) {
+				style = 3;
+			}
+
+			var conductorTime = Conductor.songPosition; //+ sectionStartTime();Conductor.songPosition / Conductor.stepCrochet;
+
+			//AWW YOU MADE IT SEXY <3333 THX SHADMAR
+
+			if(!blockInput) {
+				if(FlxG.keys.justPressed.RIGHT) {
+					curQuant++;
+					if(curQuant>quantizations.length - 1)
+						curQuant = 0;
+
+					quantization = quantizations[curQuant];
+				}
+
+				if(FlxG.keys.justPressed.LEFT) {
+					curQuant--;
+					if(curQuant<0)
+						curQuant = quantizations.length - 1;
+
+					quantization = quantizations[curQuant];
+				}
+				quant.animation.play('q', true, false, curQuant);
+			}
+			if(vortex && !blockInput) {
+				var controlArray:Array<Bool> = [FlxG.keys.justPressed.ONE, FlxG.keys.justPressed.TWO, FlxG.keys.justPressed.THREE, FlxG.keys.justPressed.FOUR,
+											   FlxG.keys.justPressed.FIVE, FlxG.keys.justPressed.SIX, FlxG.keys.justPressed.SEVEN, FlxG.keys.justPressed.EIGHT];
+
+				if(controlArray.contains(true))
+				{
+					for (i in 0...controlArray.length)
+					{
+						if(controlArray[i])
+							doANoteThing(conductorTime, i, style);
+					}
+				}
+
+				var feces:Float;
+				
+				if (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN)
+				{
+					FlxG.sound.music.pause();
+
+					updateCurStep();
+					//FlxG.sound.music.time = (Math.round(curStep / quants[curQuant]) * quants[curQuant]) * Conductor.stepCrochet;
+						//(Math.floor((curStep + quants[curQuant] * 1.5 / (quants[curQuant] / 2)) / quants[curQuant]) * quants[curQuant]) * Conductor.stepCrochet; //snap into quantization
+					
+					var time:Float = FlxG.sound.music.time;
+					var beat:Float = curDecBeat;
+					var snap:Float = quantization / 4;
+					var increase:Float = 1 / snap;
+					if (FlxG.keys.pressed.UP)
+					{
+						var fuck:Float = CoolUtil.quantize(beat, snap) - increase;
+						feces = Conductor.beatToSeconds(fuck);
+					} else {
+						var fuck:Float = CoolUtil.quantize(beat, snap) + increase; //(Math.floor((beat+snap) / snap) * snap);
+						feces = Conductor.beatToSeconds(fuck);
+					}
+					FlxTween.tween(FlxG.sound.music, {time:feces}, 0.1, {ease:FlxEase.circOut});
+					if(vocals != null) {
+						vocals.pause();
+						vocals.time = FlxG.sound.music.time;
+					}
+
+					var dastrum = 0;
+
+					if (curSelectedNote != null) {
+						dastrum = curSelectedNote[0];
+					}
+
+					var secStart:Float = sectionStartTime();
+					var datime = (feces - secStart) - (dastrum - secStart); //idk math find out why it doesn't work on any other section other than 0
+					if (curSelectedNote != null)
+					{
+						var controlArray:Array<Bool> = [FlxG.keys.pressed.ONE, FlxG.keys.pressed.TWO, FlxG.keys.pressed.THREE, FlxG.keys.pressed.FOUR,
+													   FlxG.keys.pressed.FIVE, FlxG.keys.pressed.SIX, FlxG.keys.pressed.SEVEN, FlxG.keys.pressed.EIGHT];
+
+						if(controlArray.contains(true))
+						{
+
+							for (i in 0...controlArray.length)
+							{
+								if(controlArray[i])
+									if(curSelectedNote[1] == i) curSelectedNote[2] += datime - curSelectedNote[2] - Conductor.stepCrochet;
+							}
+							updateGrid();
+							updateNoteUI();
+						}
+					}
+				}
+			}
+			var shiftThing:Int = 1;
+			if (FlxG.keys.pressed.SHIFT)
+				shiftThing = 4;
+
+			if (FlxG.keys.justPressed.D)
+				changeSection(curSec + shiftThing);
+			if (FlxG.keys.justPressed.A) {
+				if(curSec <= 0) {
+					changeSection(_song.notes.length-1);
+				} else {
+					changeSection(curSec - shiftThing);
+				}
+			}
 			#end
 		} else if (FlxG.keys.justPressed.ENTER) {
 			for (i in 0...blockPressWhileTypingOn.length) {
