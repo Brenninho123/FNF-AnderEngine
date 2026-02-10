@@ -1,0 +1,34 @@
+name: Desktop Build
+
+on:
+  workflow_dispatch:
+
+env:
+  HAXE_VERSION: 4.2.5
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-2022, ubuntu-22.04, macos-latest]
+        target: [windows, linux, mac]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: HaxeFoundation/setup-haxe@v1
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+
+      - run: |
+          haxelib install hmm --quiet
+          haxelib run hmm install --quiet
+
+      - run: haxelib run lime build ${{ matrix.target }} -release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.target }}
+          path: export/release/${{ matrix.target }}/bin/*
