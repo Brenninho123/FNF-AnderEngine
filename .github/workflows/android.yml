@@ -1,0 +1,46 @@
+name: Android Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Build-Android:
+    name: Android ARM64
+    runs-on: macos-latest
+
+    steps:
+      # Clonar repositório
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Instalar Haxe
+      - name: Setup Haxe
+        uses: HaxeFoundation/setup-haxe@v1
+        with:
+          haxe-version: 4.2.5
+
+      # Instalar bibliotecas
+      - name: Install Haxe Libraries
+        run: |
+          haxelib install hmm --quiet
+          haxelib run hmm install --quiet
+
+      # Configurar Android
+      - name: Configure Android
+        run: |
+          haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_ROOT
+          haxelib run lime config JAVA_HOME $JAVA_HOME
+          haxelib run lime config ANDROID_SETUP true
+
+      # Build APK ARM64
+      - name: Build APK (ARM64)
+        run: haxelib run lime build android -release -DONLY_ARM64
+
+      # Upload do APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AnderEngine-Android-ARM64
+          path: export/release/android/bin/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
