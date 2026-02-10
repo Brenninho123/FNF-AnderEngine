@@ -21,35 +21,34 @@ on:
 
 env:
   HAXE_VERSION: 4.2.5
-  PROJECT_NAME: AnderEngine
+  PROJECT_NAME: PsychEngine
 
 jobs:
   build:
-    name: Build
     runs-on: ${{ inputs.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # HAXE MODERNO
+      # HAXE OFICIAL
       - name: Setup Haxe
         uses: HaxeFoundation/setup-haxe@v1
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
 
-      # Dependência Linux (vídeo)
-      - name: Install libVLC
+      # Dependência Linux (vídeo/VLC)
+      - name: Install libVLC (Linux)
         if: inputs.name == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libvlc-dev libvlccore-dev
 
-      # Instalar libs Haxe
-      - name: Install Libraries
+      # Instalar libs do projeto via hmm
+      - name: Install Haxe Libraries
         run: |
           haxelib install hmm --quiet
           haxelib run hmm install --quiet
 
-      # CONFIGURAÇÃO ANDROID REAL DO RUNNER
+      # CONFIGURAÇÃO ANDROID CORRETA NO GITHUB RUNNER
       - name: Configure Android
         if: inputs.name == 'Android'
         run: |
@@ -62,11 +61,11 @@ jobs:
           haxelib run lime config JAVA_HOME $JAVA_HOME
           haxelib run lime config ANDROID_SETUP true
 
-      # COMPILAR
+      # BUILD
       - name: Compile
         run: haxelib run lime build ${{ inputs.buildArgs }}
 
-      # GERAR IPA (iOS)
+      # GERAR IPA
       - name: Make IPA
         if: inputs.name == 'iOS'
         run: |
@@ -75,7 +74,7 @@ jobs:
           mv *.app Payload
           zip -r ${{ env.PROJECT_NAME }}.ipa Payload
 
-      # UPLOAD DO BUILD
+      # UPLOAD DO ARTEFATO
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
