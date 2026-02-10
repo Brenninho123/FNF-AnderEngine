@@ -31,24 +31,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ✅ Haxe oficial (CASE CORRETO)
+      # >>> FIX AQUI: nome correto da action Haxe
       - name: Setup Haxe
         uses: HaxeFoundation/setup-haxe@v1
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
 
-      # Dependência Linux (vídeo/VLC)
+      # Instalar libVLC no Linux
       - name: Install libVLC (Linux)
         if: inputs.name == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libvlc-dev libvlccore-dev
 
-      # Instalar libs Haxe via hmm
+      # Instalar libs Haxe
       - name: Install Haxe Libraries
         run: |
           haxelib install hmm --quiet
           haxelib run hmm install --quiet
 
-      # ✅ Configuração Android correta
+      # Configurar Android (apenas se target for Android)
       - name: Configure Android
         if: inputs.name == 'Android'
         run: |
@@ -61,11 +61,11 @@ jobs:
           haxelib run lime config JAVA_HOME $JAVA_HOME
           haxelib run lime config ANDROID_SETUP true
 
-      # 🔨 Compilar
+      # Compilar de verdade
       - name: Compile
         run: haxelib run lime build ${{ inputs.buildArgs }}
 
-      # 📱 Gerar IPA
+      # Gerar IPA (se for iOS)
       - name: Make IPA
         if: inputs.name == 'iOS'
         run: |
@@ -74,7 +74,7 @@ jobs:
           mv *.app Payload
           zip -r ${{ env.PROJECT_NAME }}.ipa Payload
 
-      # 📦 Upload do artefato
+      # Upload dos artifacts
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
