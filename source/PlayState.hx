@@ -1103,11 +1103,8 @@ class PlayState extends MusicBeatState
 		// startCountdown();
 
 		#if mobile
-		#if !android
 		addTouchPad("NONE", "P");
 		addTouchPadCamera();
-		touchPad.visible = true;
-		#end
 		#end
 		
 		#if mobile
