@@ -1,31 +1,46 @@
-name: Android Build
+name: Android ARM64 Build
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
+
+env:
+  HAXE_VERSION: 4.2.5
+  PROJECT_NAME: AnderEngine
 
 jobs:
-  Build-Android:
-    name: Android ARM64
+  build-android:
+    name: Build Android (ARM64)
     runs-on: macos-latest
 
     steps:
-      # Clonar repositório
+      # 📥 Checkout
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Instalar Haxe
+      # 🧠 Cache do haxelib (acelera MUITO)
+      - name: Cache haxelib
+        uses: actions/cache@v4
+        with:
+          path: ~/haxelib
+          key: haxelib-${{ runner.os }}-${{ hashFiles('**/hmm.json') }}
+          restore-keys: |
+            haxelib-${{ runner.os }}
+
+      # 🟣 Setup Haxe
       - name: Setup Haxe
         uses: HaxeFoundation/setup-haxe@v1
         with:
-          haxe-version: 4.2.5
+          haxe-version: ${{ env.HAXE_VERSION }}
 
-      # Instalar bibliotecas
+      # 📚 Instalar libs
       - name: Install Haxe Libraries
         run: |
           haxelib install hmm --quiet
           haxelib run hmm install --quiet
 
-      # Configurar Android
+      # 🤖 Configurar Android SDK/NDK
       - name: Configure Android
         run: |
           haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
@@ -33,14 +48,26 @@ jobs:
           haxelib run lime config JAVA_HOME $JAVA_HOME
           haxelib run lime config ANDROID_SETUP true
 
-      # Build APK ARM64
-      - name: Build APK (ARM64)
+      # 🏗 Build APK ARM64
+      - name: Build APK
         run: haxelib run lime build android -release -DONLY_ARM64
 
-      # Upload do APK
+      # 🏗 Build AAB (Play Store)
+      - name: Build AAB
+        run: haxelib run lime build android -release -DONLY_ARM64 -Daab
+
+      # 📦 Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AnderEngine-Android-ARM64
+          name: ${{ env.PROJECT_NAME }}-APK
           path: export/release/android/bin/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+
+      # 📦 Upload AAB
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-AAB
+          path: export/release/android/bin/app/build/outputs/bundle/release/*.aab
           if-no-files-found: error
