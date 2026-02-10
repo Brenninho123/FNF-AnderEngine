@@ -1,6 +1,6 @@
-# Friday Night Funkin' - Psych Engine v0.6.3 Template
+# Friday Night Funkin' - Ander Engine
 
-This Template for Making any Mods and Engines you want, with Mobile Support.
+A Friday Night Funkin' engine with several modifications forked from the Psych Engine 0.6.3.
 
 ![special](docs/img/special.png)
 
