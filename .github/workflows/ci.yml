@@ -1,0 +1,19 @@
+name: AnderEngine CI
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  HAXE_VERSION: 4.2.5
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: HaxeFoundation/setup-haxe@v1
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+      - run: haxe -version
