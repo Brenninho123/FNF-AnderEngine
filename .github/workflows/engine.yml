@@ -1,0 +1,99 @@
+name: AnderEngine CI
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  HAXE_VERSION: 4.2.5
+  PROJECT_NAME: AnderEngine
+
+jobs:
+
+  # ================= ANDROID =================
+  android:
+    name: Android ARM64
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: HaxeFoundation/setup-haxe@v1
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+
+      - name: Cache haxelib
+        uses: actions/cache@v4
+        with:
+          path: ~/haxelib
+          key: haxelib-${{ runner.os }}-${{ hashFiles('**/hmm.json') }}
+          restore-keys: haxelib-${{ runner.os }}
+
+      - name: Install libs
+        run: |
+          haxelib install hmm --quiet
+          haxelib run hmm install --quiet
+
+      - name: Configure Android
+        run: |
+          haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_ROOT
+          haxelib run lime config JAVA_HOME $JAVA_HOME
+          haxelib run lime config ANDROID_SETUP true
+
+      - name: Build APK ARM64
+        run: haxelib run lime build android -release -DONLY_ARM64
+
+      - name: Build AAB ARM64
+        run: haxelib run lime build android -release -DONLY_ARM64 -Daab
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Android-APK
+          path: export/release/android/bin/app/build/outputs/apk/release/*.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Android-AAB
+          path: export/release/android/bin/app/build/outputs/bundle/release/*.aab
+
+
+  # ================= DESKTOP =================
+  desktop:
+    name: Desktop (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: windows-2022
+            target: windows
+          - os: ubuntu-22.04
+            target: linux
+          - os: macos-latest
+            target: mac
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: HaxeFoundation/setup-haxe@v1
+        with:
+          haxe-version: ${{ env.HAXE_VERSION }}
+
+      - name: Install libs
+        run: |
+          haxelib install hmm --quiet
+          haxelib run hmm install --quiet
+
+      - name: Install VLC (Linux only)
+        if: matrix.target == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y libvlc-dev libvlccore-dev
+
+      - name: Build Desktop
+        run: haxelib run lime build ${{ matrix.target }} -release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Desktop-${{ matrix.target }}
+          path: export/release/${{ matrix.target }}/bin/*
