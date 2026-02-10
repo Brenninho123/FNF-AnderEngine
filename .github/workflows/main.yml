@@ -1,7 +1,6 @@
 name: Main
-on: workflow_dispatch
-
-# permissions: write-all
+on:
+  workflow_dispatch:
 
 jobs:
   Build:
@@ -39,10 +38,11 @@ jobs:
             buildArgs: "ios -nosign"
             artifactName: IOS
             artifactPath: "export/release/ios/build/Release-iphoneos/*.ipa"
+    # 🔹 Chama a build.yml, sem duplicar steps
     uses: ./.github/workflows/build.yml
     with:
-        name: ${{ matrix.name }}
-        os: ${{ matrix.os }}
-        buildArgs: ${{ matrix.buildArgs }}
-        artifactName: ${{ matrix.artifactName }}
-        artifactPath: ${{ matrix.artifactPath }}
+      name: ${{ matrix.name }}
+      os: ${{ matrix.os }}
+      buildArgs: ${{ matrix.buildArgs }}
+      artifactName: ${{ matrix.artifactName }}
+      artifactPath: ${{ matrix.artifactPath }}
